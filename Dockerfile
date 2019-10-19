@@ -3,7 +3,7 @@ FROM kennethreitz/pipenv
 
 WORKDIR /app
 
-COPY * /app/
+COPY . /app/
 
 RUN pipenv install --deploy --system
 

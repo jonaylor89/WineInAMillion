@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
+import os
 import pandas as pd
 
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-df = pd.read_csv("wine-reviews/winemag-data_first150k.csv")
+df = pd.read_csv(os.path.join(os.getcwd(), "wine-reviews/winemag-data_first150k.csv"))
 
 
 @app.route("/")
