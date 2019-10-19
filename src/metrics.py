@@ -8,9 +8,10 @@ from bert_serving.client import BertClient
 
 
 # df= pd.read_csv("wine-reviews/winemag-data-130k-v2.csv") 
-df= pd.read_csv("../wine-reviews/winemag-data_first150k.csv") 
+#df= pd.read_csv("../wine-reviews/winemag-data_first150k.csv") 
 
 
+"""
 print(df)
 print(df.columns)
 wine_types = df['variety'].unique()
@@ -24,6 +25,7 @@ print(bert_args)
 server = BertServer(bert_args)
 server.start()
 time.sleep(20)
+"""
 bc = BertClient()
 
 print(bc.encode(['First do it', 'then do it right', 'then do it better']))
