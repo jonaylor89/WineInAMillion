@@ -7,10 +7,12 @@ verify_ssl = true
 mypy = "*"
 pylint = "*"
 pytest = "*"
+black = "*"
 
 [packages]
 flask = "*"
 gunicorn = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.7"

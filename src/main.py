@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-from flask import Flask, request
+import pandas as pd
+
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
+df = pd.read_csv("wine-reviews/winemag-data_first150k.csv")
 
 
 @app.route("/")
@@ -15,9 +18,9 @@ def wine_search():
     term = request.args.get("q", default="", type=str)
 
     if term == "":
-        return {}
-    
-    
+        return jsonify({"matches": []})
+
+    return jsonify({"matches": [item for item in df["variety"] if term in item]})
 
 
 if __name__ == "__main__":
