@@ -40,4 +40,4 @@ print("connected")
 for row in s['trigrams']:
     print("ENCODING")
     for tup in row:
-        bc.encode(tup)
+        bc.encode(list(tup))
