@@ -12,6 +12,7 @@ pytest = "*"
 flask = "*"
 gunicorn = "*"
 pandas = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.7"
