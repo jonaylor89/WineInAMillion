@@ -26,7 +26,13 @@ def wine_search():
 
 @app.route("/suggest")
 def wine_suggest():
-    return
+
+    term = request.args.get("q", default="", type=str)
+
+    if term == "":
+        return jsonify({"suggestions": []})
+
+    return jsonify({"suggestions": []})
 
 
 if __name__ == "__main__":
