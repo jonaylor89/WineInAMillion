@@ -1,0 +1,30 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: wine_in_a_million
+  labels:
+    name: wine_in_a_million
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: wine_in_a_million
+  template:
+    metadata:
+      name: wine_in_a_million
+      labels:
+        name: wine_in_a_million
+    spec:
+      containers:
+        - name: wine_in_a_million
+          image: {{ Enter gcr name here }}
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+          env:
+            - name: DEBUG_MODE
+              value: "1"
