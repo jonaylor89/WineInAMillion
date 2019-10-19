@@ -28,6 +28,22 @@ def wine_search():
     return jsonify({"matches": matches})
 
 
+@app.route("/search-unique")
+def wine_search_unique():
+    term = request.args.get("q", default="", type=str)
+
+    print("[INFO] search term:", term)
+
+    if term == "":
+        return jsonify({"matches": []})
+
+    matches = (
+        df[df["variety"].str.contains(term, na=False)]["variety"].unique().tolist()
+    )
+
+    return jsonify({"matches": matches})
+
+
 @app.route("/suggest")
 def wine_suggest():
 
