@@ -111,4 +111,5 @@ venv.bak/
 .DS_Store
 
 # dataset
+wineythepooh/
 wine-reviews/

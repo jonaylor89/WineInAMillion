@@ -23,6 +23,7 @@ def wine_search():
 
     return jsonify({"matches": [item for item in df["variety"] if term in item]})
 
+
 @app.route("/suggest")
 def wine_suggest():
     return
