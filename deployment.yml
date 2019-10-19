@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: wineinamillion
-          image: jonaylor/wininamillion
+          image: jonaylor/wineinamillion:latest
           ports:
             - containerPort: 8000
           resources:
