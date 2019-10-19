@@ -1,23 +1,23 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: wine_in_a_million
+  name: wineinamillion
   labels:
-    name: wine_in_a_million
+    name: wineinamillion
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: wine_in_a_million
+      name: wineinamillion
   template:
     metadata:
-      name: wine_in_a_million
+      name: wineinamillion
       labels:
-        name: wine_in_a_million
+        name: wineinamillion
     spec:
       containers:
-        - name: wine_in_a_million
-          image: {{ Enter gcr name here }}
+        - name: wineinamillion
+          image: jonaylor/wininamillion
           ports:
             - containerPort: 8000
           resources:
