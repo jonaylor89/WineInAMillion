@@ -8,10 +8,16 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 df = pd.read_csv(os.path.join(os.getcwd(), "wine-reviews/winemag-data-130k-v2.csv"))
 
+print(df)
+
 @app.route("/")
 def hello_world():
     return "Hello World"
 
+
+@app.route("/health")
+def health():
+    return "We live"
 
 @app.route("/search")
 def wine_search():
@@ -27,6 +33,7 @@ def wine_search():
 
     return jsonify({"matches": matches})
 
+
 @app.route("/search-variety")
 def wine_search_variety():
     term = request.args.get("q", default="", type=str)
@@ -40,6 +47,7 @@ def wine_search_variety():
     matches = df.where((pd.notnull(df)), None).to_dict("records")
 
     return jsonify({"matches": matches})
+
 """
 @app.route("/search-unique")
 def wine_search_unique():
@@ -66,9 +74,9 @@ def wine_suggest():
         return jsonify({"suggestions": []})
 
     # matches = df[df["variety"].str.contains(term, na=False)]
-    # matches = df.where((pd.notnull(df)), None).to_dict("records")
+    # matches = df.where((pd.notnull(df)), None) 
 
-    # Assuming BERT will send back titles as keys (they're the most likely condidate for primary key)
+    # suggestions = get_suggestions(variety)
 
     return jsonify({"suggestions": []})
 
