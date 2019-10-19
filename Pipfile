@@ -13,6 +13,7 @@ flask = "*"
 gunicorn = "*"
 pandas = "*"
 numpy = "*"
+nltk = "*"
 
 [requires]
 python_version = "3.7"
