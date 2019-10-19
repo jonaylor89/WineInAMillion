@@ -8,6 +8,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 df = pd.read_csv(os.path.join(os.getcwd(), "wine-reviews/winemag-data-130k-v2.csv"))
 
+print(df)
 
 @app.route("/")
 def hello_world():
@@ -17,7 +18,6 @@ def hello_world():
 @app.route("/health")
 def health():
     return "We live"
-
 
 @app.route("/search")
 def wine_search():
@@ -48,7 +48,7 @@ def wine_search_variety():
 
     return jsonify({"matches": matches})
 
-
+"""
 @app.route("/search-unique")
 def wine_search_unique():
     term = request.args.get("q", default="", type=str)
@@ -62,8 +62,8 @@ def wine_search_unique():
         df[df["variety"].str.contains(term, na=False)]["variety"].unique().tolist()
     )
 
-    return jsonify({"matches": matches})
-
+    return jsonify({"matches": matches_with_info})
+"""
 
 @app.route("/suggest")
 def wine_suggest():
@@ -74,7 +74,7 @@ def wine_suggest():
         return jsonify({"suggestions": []})
 
     # matches = df[df["variety"].str.contains(term, na=False)]
-    # matches = df.where((pd.notnull(df)), None)
+    # matches = df.where((pd.notnull(df)), None) 
 
     # suggestions = get_suggestions(variety)
 

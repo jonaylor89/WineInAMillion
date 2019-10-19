@@ -18,6 +18,7 @@ wine_types = df['variety'].unique()
 print('There are',len(wine_types),'wine types.')
 print(df['description'].head())
 
+# mani use this to encode the ngram array bud into vectors
 bert_args = get_run_args()
 print(bert_args)
 server = BertServer(bert_args)
