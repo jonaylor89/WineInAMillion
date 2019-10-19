@@ -8,7 +8,6 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 df = pd.read_csv(os.path.join(os.getcwd(), "wine-reviews/winemag-data-130k-v2.csv"))
 
-
 @app.route("/")
 def hello_world():
     return "Hello World"
@@ -23,11 +22,12 @@ def wine_search():
     if term == "":
         return jsonify({"matches": []})
 
-    matches = df[df["variety"].str.contains(term, na=False)]["variety"].tolist()
+    matches = df[df["variety"].str.contains(term, na=False)]
+    matches = df.where((pd.notnull(df)), None).to_dict("records")
 
     return jsonify({"matches": matches})
 
-
+"""
 @app.route("/search-unique")
 def wine_search_unique():
     term = request.args.get("q", default="", type=str)
@@ -41,8 +41,8 @@ def wine_search_unique():
         df[df["variety"].str.contains(term, na=False)]["variety"].unique().tolist()
     )
 
-    return jsonify({"matches": matches})
-
+    return jsonify({"matches": matches_with_info})
+"""
 
 @app.route("/suggest")
 def wine_suggest():
@@ -51,6 +51,12 @@ def wine_suggest():
 
     if term == "":
         return jsonify({"suggestions": []})
+
+    # matches = df[df["variety"].str.contains(term, na=False)]
+    # matches = df.where((pd.notnull(df)), None).to_dict("records")
+
+    # Assuming BERT will send back titles as keys (they're the most likely condidate for primary key)
+    # then the filter will be using title instead of variety
 
     return jsonify({"suggestions": []})
 
