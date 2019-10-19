@@ -1,12 +1,20 @@
-#!/usr/bin/env python3 
+#!/usr/bin/env python3
 
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
-@app.route('/')
+
+@app.route("/")
 def hello_world():
     return "Hello World"
+
+
+@app.route("/search")
+def wine_search():
+    term = request.args.get("q", default="", type=str)
+    return []
+
 
 if __name__ == "__main__":
     app.run()
