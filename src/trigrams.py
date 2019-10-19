@@ -7,7 +7,7 @@ def trigrams(desc):
     return re.sub(r'[^a-zA-Z0-9\s]', '', desc)
 
 #s = pd.read_csv("../wine-reviews/winemag-data_first150k.csv")
-s = pd.read_csv("../wine-reviews/winemag-data-130k-v2.csv") 
+s = pd.read_csv("wine-reviews/winemag-data-130k-v2.csv") 
 
 # s = s.lower()
 s["description"].map(trigrams)
