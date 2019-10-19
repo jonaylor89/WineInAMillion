@@ -1,0 +1,16 @@
+apiVersion: apps/v1beta2
+kind: Service
+metadata:
+  name: wineinamillion
+  labels:
+    name: wineinamillion
+    app: wineinamillion
+spec:
+  selector:
+    name: wineinamillion
+  type: NodePort
+  ports:
+   - port: 8000
+     name: http
+     targetPort: 5000
+     protocol: TCP
