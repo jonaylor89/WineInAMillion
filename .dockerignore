@@ -1,10 +1,7 @@
-<<<<<<< HEAD
 uncased_L-24_H-1024_A-16
 tmp*
-=======
 .mypy_cache/
 .pytest_cache/
 .vscode/
 
 wineythepooh/
->>>>>>> ba28ffd58d67bc14c13dcb0fbfd79bf0f113f990
