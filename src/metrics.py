@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-df= pd.read_csv("wine-reviews/winemag-data-130k-v2.csv") 
+df= pd.read_csv("wine-reviews/winemag-data_first150k.csv") 
 
 print(df)
 print(df.columns)
