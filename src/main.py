@@ -22,11 +22,24 @@ def wine_search():
     if term == "":
         return jsonify({"matches": []})
 
-    matches = df[df["variety"].str.contains(term, na=False)]
+    matches = df[df["title"].str.contains(term, na=False)]
     matches = df.where((pd.notnull(df)), None).to_dict("records")
 
     return jsonify({"matches": matches})
 
+@app.route("/search-variety")
+def wine_search_variety():
+    term = request.args.get("q", default="", type=str)
+
+    print("[INFO] search term:", term)
+
+    if term == "":
+        return jsonify({"matches": []})
+
+    matches = df[df["variety"].str.contains(term, na=False)]
+    matches = df.where((pd.notnull(df)), None).to_dict("records")
+
+    return jsonify({"matches": matches})
 """
 @app.route("/search-unique")
 def wine_search_unique():
@@ -56,7 +69,6 @@ def wine_suggest():
     # matches = df.where((pd.notnull(df)), None).to_dict("records")
 
     # Assuming BERT will send back titles as keys (they're the most likely condidate for primary key)
-    # then the filter will be using title instead of variety
 
     return jsonify({"suggestions": []})
 
