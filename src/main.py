@@ -13,7 +13,11 @@ def hello_world():
 @app.route("/search")
 def wine_search():
     term = request.args.get("q", default="", type=str)
-    return []
+
+    if term == "":
+        return {}
+    
+    
 
 
 if __name__ == "__main__":
