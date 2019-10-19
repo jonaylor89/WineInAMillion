@@ -8,7 +8,7 @@ from bert_serving.client import BertClient
 
 
 # df= pd.read_csv("wine-reviews/winemag-data-130k-v2.csv") 
-df= pd.read_csv("wine-reviews/winemag-data_first150k.csv") 
+df= pd.read_csv("../wine-reviews/winemag-data_first150k.csv") 
 
 
 print(df)

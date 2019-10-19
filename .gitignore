@@ -112,5 +112,6 @@ venv.bak/
 
 # dataset
 wineythepooh/
+uncased_L-24_H-1024_A-16/
 wine-reviews/
 tmp*
