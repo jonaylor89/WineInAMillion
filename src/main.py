@@ -6,7 +6,7 @@ import pandas as pd
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-df = pd.read_csv(os.path.join(os.getcwd(), "wine-reviews/winemag-data_first150k.csv"))
+df = pd.read_csv(os.path.join(os.getcwd(), "wine-reviews/winemag-data-130k-v2.csv"))
 
 
 @app.route("/")
@@ -18,10 +18,30 @@ def hello_world():
 def wine_search():
     term = request.args.get("q", default="", type=str)
 
+    print("[INFO] search term:", term)
+
     if term == "":
         return jsonify({"matches": []})
 
-    return jsonify({"matches": [item for item in df["variety"] if term in item]})
+    matches = df[df["variety"].str.contains(term, na=False)]["variety"].tolist()
+
+    return jsonify({"matches": matches})
+
+
+@app.route("/search-unique")
+def wine_search_unique():
+    term = request.args.get("q", default="", type=str)
+
+    print("[INFO] search term:", term)
+
+    if term == "":
+        return jsonify({"matches": []})
+
+    matches = (
+        df[df["variety"].str.contains(term, na=False)]["variety"].unique().tolist()
+    )
+
+    return jsonify({"matches": matches})
 
 
 @app.route("/suggest")
