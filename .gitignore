@@ -117,3 +117,6 @@ wine-reviews/
 tmp*
 uncased*/
 data/
+data/embedded.json
+data/clean_embedded.json
+data/clean_embedded.json.tar.bz2
