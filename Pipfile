@@ -18,6 +18,7 @@ tensorflow = "==1.15.0"
 bert-serving-client = "*"
 bert-serving-server = "*"
 ipykernel = "*"
+progress = "*"
 
 [requires]
 python_version = "3.7"
