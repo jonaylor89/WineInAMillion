@@ -19,6 +19,7 @@ bert-serving-client = "*"
 bert-serving-server = "*"
 ipykernel = "*"
 progress = "*"
+scipy = "*"
 
 [requires]
 python_version = "3.7"
