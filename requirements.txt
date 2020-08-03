@@ -1,0 +1,11 @@
+flask
+gunicorn
+pandas
+numpy 
+nltk 
+tensorflow==1.15.2
+bert-serving-client 
+bert-serving-server 
+ipykernel 
+progress 
+scipy 

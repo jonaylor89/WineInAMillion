@@ -20,4 +20,4 @@ This is packaged as a flask api with the endpoint `\suggest` as the route for se
 ### Training
 
 The training to get the embeddings was in the `notesbooks/` directory. In there are the jupyter notesbooks
-used to train everything with BERT as a service.
+<!-- used to train everything with BERT as a service. -->
