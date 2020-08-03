@@ -1,4 +1,5 @@
-runtime: python
+runtime: python37
+env: standard
 entrypoint: gunicorn --pythonpath src main:app -b 0.0.0.0:8000
 
 runtime_config:
