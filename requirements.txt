@@ -3,7 +3,7 @@ gunicorn
 pandas
 numpy 
 nltk 
-tensorflow==1.15.2
+tensorflow==2.3.1
 bert-serving-client 
 bert-serving-server 
 ipykernel 
