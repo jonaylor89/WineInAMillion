@@ -1,0 +1,30 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: wineinamillion
+  labels:
+    name: wineinamillion
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: wineinamillion
+  template:
+    metadata:
+      name: wineinamillion
+      labels:
+        name: wineinamillion
+    spec:
+      containers:
+        - name: wineinamillion
+          image: jonaylor/wineinamillion:latest
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+          env:
+            - name: DEBUG_MODE
+              value: "1"
