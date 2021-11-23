@@ -1,0 +1,3 @@
+sentence-transformers
+boto3
+pandas
