@@ -4,19 +4,14 @@ import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
+    <div class="App">
+      <header class="App-header">
         <h1>Wine in a Million</h1>
         <HomepageImage />
-        </header>
-        <div className="App-Component">
-        <SearchBox/>  
-      
-        <div className="App-Component">
-          
-        </div>
-        
-    </div>
+      </header>
+      <div class="App-Component">
+        <SearchBox />
+      </div>
     </div>
   );
 }

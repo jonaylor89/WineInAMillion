@@ -28,8 +28,9 @@
 
 .SearchBox button {
     /* background-color: red; */
-    background-color: #007a87;
-    color: #ffb500;
+    background-color: #ffb500;
+    color: white;
+    font-weight: bold;
     border: 0px;
     width: 6em;
     height: 100%;
