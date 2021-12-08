@@ -8,7 +8,7 @@ import json
 import io
 import time
 import pandas as pd
-from sklearn.externals import joblib
+import joblib
 from sklearn.neighbors import NearestNeighbors
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ CONTENT_TYPE = 'application/json'
 def model_fn(model_dir):
     logger.info('model_fn')
     logger.info(model_dir)
-    model = joblib.load(model_dir)
+    model = joblib.load(model_dir + '/model.joblib')
     logger.info(model)
     return model
 
@@ -36,7 +36,7 @@ def predict_fn(input_object, model):
     logger.info("Calling model")
     start_time = time.time()
     print(input_object)
-    embeddingsVector input_object['embeddings']
+    embeddingsVector = [input_object['embeddings']]
     print('embeddings', embeddingsVector)
     neighbors = model.kneighbors(embeddingsVector, 5, return_distance=False)
     print("--- Inference time: %s seconds ---" % (time.time() - start_time))
@@ -46,7 +46,7 @@ def predict_fn(input_object, model):
 def output_fn(prediction, accept):
     logger.info('Serializing the generated output.')
     if accept == 'application/json':
-        output = json.dumps({"recommendations": prediction})
+        output = json.dumps({"recommendations": list(prediction)})
         return output
     raise Exception('Requested unsupported ContentType in Accept: {}'.format(content_type))
 
