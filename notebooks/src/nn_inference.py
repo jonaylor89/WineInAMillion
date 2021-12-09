@@ -37,16 +37,18 @@ def predict_fn(input_object, model):
     start_time = time.time()
     print(input_object)
     embeddingsVector = [input_object['embeddings']]
-    print('embeddings', embeddingsVector)
-    neighbors = model.kneighbors(embeddingsVector, 5, return_distance=False)
+    kneighbors = input_object['kneighbors']
+    print(f'k neighbors {kneighbors}')
+    neighbors = model.kneighbors(embeddingsVector, kneighbors, return_distance=False)
     print("--- Inference time: %s seconds ---" % (time.time() - start_time))
-    return neighbors
+    print(f'neighbors {neighbors}')
+    return neighbors[0].tolist()
 
 # Serialize the prediction result into the desired response content type
 def output_fn(prediction, accept):
     logger.info('Serializing the generated output.')
     if accept == 'application/json':
-        output = json.dumps({"recommendations": list(prediction)})
+        output = json.dumps({"recommendations": prediction})
         return output
     raise Exception('Requested unsupported ContentType in Accept: {}'.format(content_type))
 
