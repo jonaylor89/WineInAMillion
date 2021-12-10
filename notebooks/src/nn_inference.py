@@ -36,13 +36,23 @@ def predict_fn(input_object, model):
     logger.info("Calling model")
     start_time = time.time()
     print(input_object)
-    embeddingsVector = [input_object['embeddings']]
-    kneighbors = input_object['kneighbors']
-    print(f'k neighbors {kneighbors}')
-    neighbors = model.kneighbors(embeddingsVector, kneighbors, return_distance=False)
-    print("--- Inference time: %s seconds ---" % (time.time() - start_time))
-    print(f'neighbors {neighbors}')
-    return neighbors[0].tolist()
+    
+    try: 
+        embeddingsVector = [input_object['embeddings']]
+        
+        kneighbors = 5
+        if 'kneighbors' in input_object.keys():
+            kneighbors = input_object['kneighbors']
+
+        print(f'k neighbors {kneighbors}')
+        neighbors = model.kneighbors(embeddingsVector, kneighbors, return_distance=False)
+        print("--- Inference time: %s seconds ---" % (time.time() - start_time))
+        print(f'neighbors {neighbors}')
+        return neighbors[0].tolist()
+    
+    except Exception as e:
+        print(e)
+        return []
 
 # Serialize the prediction result into the desired response content type
 def output_fn(prediction, accept):

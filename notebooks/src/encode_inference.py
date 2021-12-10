@@ -51,6 +51,6 @@ def predict_fn(input_object, model):
 def output_fn(prediction, accept):
     logger.info('Serializing the generated output.')
     if accept == 'application/json':
-        output = json.dumps(prediction)
+        output = json.dumps({'embeddings': prediction})
         return output
     raise Exception('Requested unsupported ContentType in Accept: {}'.format(content_type))
