@@ -10,6 +10,7 @@ import time
 import pandas as pd
 import joblib
 from sklearn.neighbors import NearestNeighbors
+import numpy as np
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -45,10 +46,12 @@ def predict_fn(input_object, model):
             kneighbors = input_object['kneighbors']
 
         print(f'k neighbors {kneighbors}')
-        neighbors = model.kneighbors(embeddingsVector, kneighbors, return_distance=False)
+        distanceNeighbors = model.kneighbors(embeddingsVector, kneighbors, return_distance=True)
         print("--- Inference time: %s seconds ---" % (time.time() - start_time))
-        print(f'neighbors {neighbors}')
-        return neighbors[0].tolist()
+        print(f'distanceNeighbors {distanceNeighbors}')
+        zipped = list(zip(distanceNeighbors[1].tolist()[0], distanceNeighbors[0].tolist()[0]))
+        print(f'zipped neighbors {zipped}')
+        return zipped
     
     except Exception as e:
         print(e)
