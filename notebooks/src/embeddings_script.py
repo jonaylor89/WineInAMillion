@@ -97,4 +97,4 @@ if __name__ == "__main__":
     del embeddings_df["embeddings.csv"]
 
     # Save to output data dir
-    embeddings_df.to_csv(f"{args.model_dir}/embeddings.csv")
+    embeddings_df.to_csv(f"{args.output_data_dir}/embeddings.csv")
