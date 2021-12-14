@@ -87,7 +87,7 @@ if __name__ == "__main__":
     raw_data = pd.read_csv(args.train)
 
     embeddings = []
-    for i in range(len(raw_data["clean_desc"]) - 100, len(df["clean_desc"])):
+    for i in range(0, len(df["clean_desc"]) - 1):
         vector = model.encode([raw_data["clean_desc"][i]])
         embeddings.append(vector)
 
@@ -97,4 +97,4 @@ if __name__ == "__main__":
     del embeddings_df["embeddings.csv"]
 
     # Save to output data dir
-    embeddings_df.to_csv(f"{args.output_data_dir}/embeddings.csv")
+    embeddings_df.to_csv(f"{args.model_dir}/embeddings.csv")
