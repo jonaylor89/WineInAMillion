@@ -70,7 +70,7 @@ if __name__ == "__main__":
     # Sagemaker specific arguments. Defaults are set in the environment variables.
     parser.add_argument("--output-data-dir", type=str)
     parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
-    parser.add_argument("--train", type=str)
+    parser.add_argument("--train", type=str, default=os.environ["SM_CHANNEL_TRAIN"])
 
     args = parser.parse_args()
 
@@ -84,17 +84,16 @@ if __name__ == "__main__":
     model.save(args.model_dir)
 
     # Load the training data into a Pandas dataframe and make sure it is in the appropriate format
-    raw_data = pd.read_csv(args.train)
+    raw_data = pd.read_csv(f"{args.train}/dataset.csv")
 
     embeddings = []
-    for i in range(0, len(df["clean_desc"]) - 1):
+    for i in range(0, len(raw_data["clean_desc"]) - 1):
         vector = model.encode([raw_data["clean_desc"][i]])
         embeddings.append(vector)
 
     embeddings_flattened = list(map(lambda x: x[0], embeddings))
     embeddings_df = pd.DataFrame(embeddings_flattened)
     embeddings_df = embeddings_df[:-1]
-    del embeddings_df["embeddings.csv"]
 
     # Save to output data dir
     embeddings_df.to_csv(f"{args.output_data_dir}/embeddings.csv")
