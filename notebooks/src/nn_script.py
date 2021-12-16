@@ -88,29 +88,20 @@ if __name__ == "__main__":
     # Sagemaker specific arguments. Defaults are set in the environment variables.
     parser.add_argument("--output-data-dir", type=str)
     parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
-    parser.add_argument("--train", type=str)
+    parser.add_argument("--train", type=str, default=os.environ["SM_CHANNEL_TRAIN"])
 
     args = parser.parse_args()
 
     # Load the training data into a Pandas dataframe and make sure it is in the appropriate format
-    raw_data = pd.read_csv(args.train)
-
-    def convert_to_list(raw_review_vec):
-        review_vec_trimmed = raw_review_vec.replace("[", "").replace("]", "")
-        review_vec = np.fromstring(review_vec_trimmed, dtype=float, sep="  ")
-        review_vec_list = review_vec.tolist()
-        return review_vec_list
-
-    raw_data["review_vec"] = raw_data["review_vector"].apply(convert_to_list)
-    wine_vectors_list = np.array(list(raw_data["review_vec"]))
-
+    embeddings = pd.read_csv(os.path.join(args.train, "embeddings.csv.tar.gz"), compression='gzip')
+    
     # Supply the hyperparameters of the nearest neighbors model
     n_neighbors = args.n_neighbors
     metric = args.metric
 
     # Now, fit the nearest neighbors model
     nn = NearestNeighbors(n_neighbors=n_neighbors, metric=metric)
-    model_nn = nn.fit(wine_vectors_list)
+    model_nn = nn.fit(embeddings)
     print("model has been fitted")
 
     # Save the model to the output location in S3

@@ -96,4 +96,7 @@ if __name__ == "__main__":
     embeddings_df = embeddings_df[:-1]
 
     # Save to output data dir
-    embeddings_df.to_csv(f"{args.output_data_dir}/embeddings.csv")
+    embeddings_df.to_csv(os.path.join(args.output_data_dir, "embeddings.csv.tar.gz"), compression='gzip')
+
+    #Upload the embeddings to S3
+    boto3.Session().resource("s3").Bucket(bucket).upload_file(os.path.join(args.output_data_dir, "embeddings.csv.tar.gz"), 'model/embeddings/embeddings.csv.tar.gz')
