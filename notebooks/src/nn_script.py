@@ -93,7 +93,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Load the training data into a Pandas dataframe and make sure it is in the appropriate format
-    embeddings = pd.read_csv(os.path.join(args.train, "embeddings.csv.tar.gz"), compression='gzip')
+    embeddings = pd.read_csv(os.path.join(args.train, "embeddings.csv.tar.gz"), compression='gzip', index=False, header=False)
     
     # Supply the hyperparameters of the nearest neighbors model
     n_neighbors = args.n_neighbors

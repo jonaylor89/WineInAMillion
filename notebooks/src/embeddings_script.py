@@ -9,6 +9,7 @@ import io
 import time
 import torch
 import pandas as pd
+from urllib.parse import urlparse
 from sentence_transformers import models, losses, SentenceTransformer
 
 logger = logging.getLogger(__name__)
@@ -22,7 +23,7 @@ def model_fn(model_dir):
     logger.info("model_fn")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(model_dir)
-    model = SentenceTransformer(model_dir + "/transformer/")
+    model = SentenceTransformer(model_dir)
     logger.info(model)
     return model.to(device)
 
@@ -67,6 +68,10 @@ def output_fn(prediction, accept):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
+    # Hyperparameters 
+    parser.add_argument("--embeddings-output-path", type=str)
+
+    
     # Sagemaker specific arguments. Defaults are set in the environment variables.
     parser.add_argument("--output-data-dir", type=str)
     parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
@@ -87,7 +92,8 @@ if __name__ == "__main__":
     raw_data = pd.read_csv(f"{args.train}/dataset.csv")
 
     embeddings = []
-    for i in range(0, len(raw_data["clean_desc"]) - 1):
+    # TODO: change range when done debugging
+    for i in range(len(raw_data["clean_desc"]) - 100, len(raw_data["clean_desc"]) - 1):
         vector = model.encode([raw_data["clean_desc"][i]])
         embeddings.append(vector)
 
@@ -96,7 +102,10 @@ if __name__ == "__main__":
     embeddings_df = embeddings_df[:-1]
 
     # Save to output data dir
-    embeddings_df.to_csv(os.path.join(args.output_data_dir, "embeddings.csv.tar.gz"), compression='gzip')
+    embeddings_df.to_csv(os.path.join(args.output_data_dir, "embeddings.csv.gz"), compression='gzip', index=False, header=False)
 
     #Upload the embeddings to S3
-    boto3.Session().resource("s3").Bucket(bucket).upload_file(os.path.join(args.output_data_dir, "embeddings.csv.tar.gz"), 'model/embeddings/embeddings.csv.tar.gz')
+    o = urlparse(args.embeddings_output_path)
+    bucket = o.netloc
+    key = o.path[1:]
+    boto3.Session().resource("s3").Bucket(bucket).upload_file(os.path.join(args.output_data_dir, "embeddings.csv.gz"), key)
