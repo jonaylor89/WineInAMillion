@@ -68,10 +68,9 @@ def output_fn(prediction, accept):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    # Hyperparameters 
+    # Hyperparameters
     parser.add_argument("--embeddings-output-path", type=str)
 
-    
     # Sagemaker specific arguments. Defaults are set in the environment variables.
     parser.add_argument("--output-data-dir", type=str)
     parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
@@ -79,9 +78,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    model_name = 'sentence-transformers/all-MiniLM-L6-v2'
+    model_name = "sentence-transformers/all-MiniLM-L6-v2"
 
-    saved_model_dir = 'transformer'
+    saved_model_dir = "transformer"
     if not os.path.isdir(saved_model_dir):
         os.makedirs(saved_model_dir)
 
@@ -102,10 +101,17 @@ if __name__ == "__main__":
     embeddings_df = embeddings_df[:-1]
 
     # Save to output data dir
-    embeddings_df.to_csv(os.path.join(args.output_data_dir, "embeddings.csv.gz"), compression='gzip', index=False, header=False)
+    embeddings_df.to_csv(
+        os.path.join(args.output_data_dir, "embeddings.csv.gz"),
+        compression="gzip",
+        index=False,
+        header=False,
+    )
 
-    #Upload the embeddings to S3
+    # Upload the embeddings to S3
     o = urlparse(args.embeddings_output_path)
     bucket = o.netloc
     key = o.path[1:]
-    boto3.Session().resource("s3").Bucket(bucket).upload_file(os.path.join(args.output_data_dir, "embeddings.csv.gz"), key)
+    boto3.Session().resource("s3").Bucket(bucket).upload_file(
+        os.path.join(args.output_data_dir, "embeddings.csv.gz"), key
+    )
