@@ -12,6 +12,16 @@ import pandas as pd
 from urllib.parse import urlparse
 from sentence_transformers import models, losses, SentenceTransformer
 
+# Preprocessing
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from string import punctuation
+
+nltk.download("stopwords")
+nltk.download("punkt")
+nltk.download("wordnet")
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -27,6 +37,18 @@ def model_fn(model_dir):
     logger.info(model)
     return model.to(device)
 
+def clean_data(desc):
+    words = stopwords.words('english')
+    lower = " ".join([w for w in desc.lower().split() if not w in words])
+    punct = ''.join(ch for ch in lower if ch not in punctuation)
+    wordnet_lemmatizer = WordNetLemmatizer()
+
+    word_tokens = nltk.word_tokenize(punct)
+    lemmatized_words = [wordnet_lemmatizer.lemmatize(word) for word in word_tokens]
+
+    words_joined = " ".join(lemmatized_words)
+    
+    return words_joined
 
 # Deserialize the Invoke request body into an object we can perform prediction on
 def input_fn(serialized_input_data, content_type=CONTENT_TYPE):
@@ -34,6 +56,7 @@ def input_fn(serialized_input_data, content_type=CONTENT_TYPE):
     print(serialized_input_data)
     if content_type == CONTENT_TYPE:
         data = json.loads(serialized_input_data)
+        data['data'] = clean_data(data['data'])
         return data
     raise Exception(
         "Requested unsupported ContentType in content_type: {}".format(content_type)
