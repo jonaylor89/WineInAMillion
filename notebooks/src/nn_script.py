@@ -75,10 +75,9 @@ def predict_fn(input_object, model):
         print(f"neighbors {neighbors}")
         print(f"distances {distances}")
         result = list(map(mergeWineDistances, neighbors[0],distances[0]))
-        print(f"zipped neighbors {result}")
-        print(f"zipped neighbors {pd.Series(result).to_json()}")
+        print(f"zipped neighbors {pd.DataFrame(result).to_json(orient='records')}")
         
-        return pd.Series(result).to_json()
+        return pd.DataFrame(result).to_json(orient='records')
 
     except Exception as e:
         print(e)
