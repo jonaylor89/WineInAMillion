@@ -21,6 +21,7 @@ from string import punctuation
 nltk.download("stopwords")
 nltk.download("punkt")
 nltk.download("wordnet")
+nltk.download('omw-1.4')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

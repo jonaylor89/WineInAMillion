@@ -18,6 +18,18 @@ logger.setLevel(logging.DEBUG)
 CONTENT_TYPE = "application/json"
 
 
+bucket = "wineinamillion"
+prefix = "data/"
+filename = "winemag-data-130k-v2.csv"
+
+assert bucket != "<S3_BUCKET>"
+assert prefix != "<S3_KEY_PREFIX>"
+assert filename != "<DATASET_FILENAME>"
+
+# Read the dataset into memory.  This is generally bad practice and in a production environment we'd use a real database to reference against
+raw_data_location = f"s3://{bucket}/{prefix}raw/{filename}"
+df = pd.read_csv(raw_data_location)
+
 def model_fn(model_dir):
     logger.info("model_fn")
     logger.info(model_dir)
@@ -37,6 +49,11 @@ def input_fn(serialized_input_data, content_type=CONTENT_TYPE):
     )
 
 
+def mergeWineDistances(idx,distance):
+    wine = df.iloc[idx]
+    wine['distance'] = distance
+    return wine
+
 # Perform prediction on the deserialized object, with the loaded model
 def predict_fn(input_object, model):
     logger.info("Calling model")
@@ -51,16 +68,17 @@ def predict_fn(input_object, model):
             kneighbors = input_object["kneighbors"]
 
         print(f"k neighbors {kneighbors}")
-        distanceNeighbors = model.kneighbors(
+        distances, neighbors = model.kneighbors(
             embeddingsVector, kneighbors, return_distance=True
         )
         print("--- Inference time: %s seconds ---" % (time.time() - start_time))
-        print(f"distanceNeighbors {distanceNeighbors}")
-        zipped = list(
-            zip(distanceNeighbors[1].tolist()[0], distanceNeighbors[0].tolist()[0])
-        )
-        print(f"zipped neighbors {zipped}")
-        return zipped
+        print(f"neighbors {neighbors}")
+        print(f"distances {distances}")
+        result = list(map(mergeWineDistances, neighbors[0],distances[0]))
+        print(f"zipped neighbors {result}")
+        print(f"zipped neighbors {pd.Series(result).to_json()}")
+        
+        return pd.Series(result).to_json()
 
     except Exception as e:
         print(e)

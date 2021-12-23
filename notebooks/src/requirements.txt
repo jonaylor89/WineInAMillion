@@ -2,3 +2,5 @@ sentence-transformers
 boto3
 pandas
 joblib
+fsspec
+s3fs
