@@ -1,0 +1,19 @@
+name: default
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7
+  - typing 
+  - ipython
+  - scikit-learn
+  - codecov
+  - numpy
+  - pandas
+  - sagemaker
+  - sentence-transformers
+  - opendatasets
+  - boto3
+  - joblib
+  - fsspec
+  - s3fs
