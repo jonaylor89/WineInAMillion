@@ -5,7 +5,7 @@ Wine Recommender created with sentence-BERT and NearestNeighbor on AWS SageMaker
 
 Authors: [Zephyr](https://github.com/JZHeadley) and [Johannes](https://jonaylor.xyz)
 
-[Blog Post](https://blog.jonaylor.xyz/create-a-wine-recommender-using-nlp-on-aws)
+[Blog Post](https://www.jonaylor.com/blog/create-a-wine-recommender)
 
 -----
 
