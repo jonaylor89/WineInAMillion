@@ -1,0 +1,156 @@
+.app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 6rem;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  margin: 0;
+  letter-spacing: -0.02em;
+  color: var(--wine-deep);
+}
+.hero h1 span {
+  color: var(--wine);
+  font-style: italic;
+}
+.tagline {
+  color: var(--muted);
+  font-size: 1.05rem;
+  max-width: 48ch;
+}
+
+.searchbox {
+  margin-top: 1.5rem;
+  background: #fff;
+  border: 1px solid #ecdfe2;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px -18px rgba(74, 22, 34, 0.5);
+}
+.searchbox textarea {
+  width: 100%;
+  border: none;
+  resize: vertical;
+  font: inherit;
+  font-size: 1.1rem;
+  outline: none;
+  background: transparent;
+}
+.searchbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+}
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.examples button {
+  border: 1px solid #ecdfe2;
+  background: var(--cream);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.examples button:hover {
+  color: var(--wine);
+  border-color: var(--wine);
+}
+button.primary {
+  background: var(--wine);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+button.primary:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.error {
+  color: #b3261e;
+  font-weight: 500;
+}
+
+.sommelier {
+  margin-top: 2rem;
+  background: var(--wine-deep);
+  color: var(--cream);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+}
+.sommelier h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+.sommelier p {
+  margin: 0;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.results {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1rem;
+}
+.card {
+  background: #fff;
+  border: 1px solid #ecdfe2;
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+}
+.card-head h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--wine-deep);
+}
+.match {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--wine);
+  background: var(--cream);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+.meta {
+  color: var(--wine);
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0.6rem;
+}
+.description {
+  margin: 0;
+  line-height: 1.55;
+  color: #4a3f43;
+}
+.card-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.9rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.stats b {
+  color: var(--ink);
+}

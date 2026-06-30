@@ -1,0 +1,20 @@
+:root {
+  --wine: #7b2d3b;
+  --wine-deep: #4a1622;
+  --cream: #faf6f1;
+  --ink: #2b2024;
+  --muted: #8a7a7f;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #fff 0%, var(--cream) 60%);
+  min-height: 100vh;
+}
