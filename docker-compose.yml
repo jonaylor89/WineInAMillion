@@ -1,0 +1,70 @@
+# Local 2026 stack: MinIO (cheap S3-compatible blob store) + FastAPI backend
+# + Vite/React frontend. LanceDB stores its table inside the MinIO bucket, so
+# there is no separate vector database to run.
+#
+#   docker compose up -d minio createbuckets
+#   # ingest once (downloads the embedding model on first run):
+#   docker compose run --rm backend uv run python -m app.ingest --csv /data/winemag-data-130k-v2.csv --overwrite
+#   docker compose up backend frontend
+
+services:
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # web console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-shot job that creates the "wine" bucket.
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 minioadmin minioadmin;
+      mc mb --ignore-existing local/wine;
+      echo 'bucket ready';
+      "
+
+  backend:
+    build: ./backend
+    depends_on:
+      - minio
+    ports:
+      - "8000:8000"
+    environment:
+      LANCEDB_URI: s3://wine/lancedb
+      AWS_ENDPOINT: http://minio:9000
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      AWS_ALLOW_HTTP: "true"
+      AWS_REGION: us-east-1
+      CORS_ORIGINS: http://localhost:5173
+      # Set these to turn on the sommelier note:
+      # LLM_ENABLED: "true"
+      # LLM_API_KEY: ${LLM_API_KEY}
+    volumes:
+      # mount your downloaded dataset here for the ingest job
+      - ./backend/data:/data
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  minio-data:
