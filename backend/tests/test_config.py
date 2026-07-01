@@ -1,5 +1,7 @@
 """Lightweight tests that don't require the ML stack or network."""
 
+import json
+
 from app.config import Settings
 
 
@@ -22,12 +24,24 @@ def test_s3_storage_options_for_minio():
     assert opts["aws_access_key_id"] == "minioadmin"
 
 
-def test_gcs_storage_options():
+def test_gcs_storage_options_for_service_account(tmp_path):
+    credential = tmp_path / "sa.json"
+    credential.write_text(json.dumps({"type": "service_account"}))
     s = Settings(
         lancedb_uri="gs://wine-bucket/lancedb",
-        google_service_account="/secrets/sa.json",
+        google_service_account=str(credential),
     )
-    assert s.storage_options() == {"google_service_account": "/secrets/sa.json"}
+    assert s.storage_options() == {"google_service_account": str(credential)}
+
+
+def test_gcs_storage_options_for_user_adc(tmp_path):
+    credential = tmp_path / "adc.json"
+    credential.write_text(json.dumps({"type": "authorized_user"}))
+    s = Settings(
+        lancedb_uri="gs://wine-bucket/lancedb",
+        google_application_credentials=str(credential),
+    )
+    assert s.storage_options() == {"google_application_credentials": str(credential)}
 
 
 def test_cors_origin_list_splits():

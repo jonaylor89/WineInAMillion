@@ -87,10 +87,10 @@ variable "backend_concurrency" {
   default     = 10
 }
 
-variable "llm_enabled" {
-  description = "Whether the backend should attempt to generate LLM explanations."
-  type        = bool
-  default     = false
+variable "ingest_timeout" {
+  description = "Cloud Run Job task timeout for full-dataset embedding ingestion."
+  type        = string
+  default     = "7200s"
 }
 
 variable "llm_model" {
@@ -106,19 +106,13 @@ variable "llm_base_url" {
 }
 
 variable "llm_api_key_secret" {
-  description = "Optional Secret Manager secret ID containing the LLM API key. Example: wine-llm-api-key"
+  description = "Secret Manager secret ID containing the required LLM API key. Example: wine-llm-api-key"
   type        = string
-  default     = ""
+  default     = "wine-llm-api-key"
 }
 
 variable "ingest_csv_uri" {
   description = "Optional gs:// URI for the wine CSV. If set with deploy_backend=true, creates a Cloud Run Job."
   type        = string
   default     = ""
-}
-
-variable "create_frontend_bucket" {
-  description = "Create a public GCS static website bucket for the built frontend."
-  type        = bool
-  default     = true
 }

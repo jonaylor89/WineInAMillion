@@ -7,7 +7,9 @@ that changes between environments is ``LANCEDB_URI`` and the credentials.
 
 from __future__ import annotations
 
+import json
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -34,17 +36,23 @@ class Settings(BaseSettings):
     aws_endpoint: str | None = None  # e.g. http://localhost:9000 for MinIO
     aws_allow_http: bool = False
 
-    # GCS service-account JSON path (only used for gs:// URIs).
+    # GCS credential JSON path (only used for gs:// URIs). LanceDB's object-store
+    # layer needs this passed explicitly; relying on GOOGLE_APPLICATION_CREDENTIALS
+    # alone is not enough in local Docker ingestion.
     google_service_account: str | None = None
+    google_application_credentials: str | None = None
 
     # --- Embeddings ---------------------------------------------------------
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     embedding_dim: int = 384
+    # Hugging Face token for rate limits / gated models. HF_TOKEN is also
+    # supported because the hub itself recognizes it.
+    huggingface_token: str | None = None
+    hf_token: str | None = None
     # bge models recommend a short instruction prefix for retrieval queries.
     query_instruction: str = "Represent this sentence for searching relevant wines: "
 
-    # --- LLM explanation layer (optional) -----------------------------------
-    llm_enabled: bool = False
+    # --- LLM explanation layer ----------------------------------------------
     llm_base_url: str | None = None  # OpenAI-compatible endpoint override
     llm_api_key: str | None = None
     llm_model: str = "gpt-4o-mini"
@@ -66,8 +74,20 @@ class Settings(BaseSettings):
             if self.aws_allow_http:
                 opts["allow_http"] = "true"
             return opts
-        if self.lancedb_uri.startswith("gs://") and self.google_service_account:
-            return {"google_service_account": self.google_service_account}
+        if self.lancedb_uri.startswith("gs://"):
+            credential_path = self.google_service_account or self.google_application_credentials
+            if credential_path:
+                # Object-store distinguishes service-account JSON from user ADC.
+                # Local `gcloud auth application-default login` creates an
+                # `authorized_user` file, not a service-account file. Do not set
+                # GOOGLE_SERVICE_ACCOUNT to an authorized_user ADC file.
+                try:
+                    credential_type = json.loads(Path(credential_path).read_text()).get("type")
+                except Exception:
+                    credential_type = None
+                if credential_type == "service_account":
+                    return {"google_service_account": credential_path}
+                return {"google_application_credentials": credential_path}
         return None
 
     def cors_origin_list(self) -> list[str]:

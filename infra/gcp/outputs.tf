@@ -22,15 +22,3 @@ output "ingest_job" {
   description = "Cloud Run Job name, if created."
   value       = length(google_cloud_run_v2_job.ingest) > 0 ? google_cloud_run_v2_job.ingest[0].name : null
 }
-
-output "frontend_bucket" {
-  description = "Static frontend bucket, if enabled."
-  value       = length(google_storage_bucket.frontend) > 0 ? "gs://${google_storage_bucket.frontend[0].name}" : null
-}
-
-output "frontend_website_url" {
-  description = "GCS website endpoint for the static frontend bucket. For HTTPS/custom domains, put Cloudflare or a Google HTTPS LB in front."
-  value = length(google_storage_bucket.frontend) > 0 ? (
-    "http://storage.googleapis.com/${google_storage_bucket.frontend[0].name}/index.html"
-  ) : null
-}

@@ -3,7 +3,7 @@
 This replaces the 2019 two-step SageMaker pipeline (an embeddings training job
 that wrote ``embeddings.csv.gz`` to S3, then a separate job that fit a
 scikit-learn ``NearestNeighbors`` model). Now it is a single idempotent script:
-read the wine reviews, embed the descriptions in batches, and write everything
+read the wine reviews, embed the descriptions in batches, and write each batch
 into one LanceDB table that lives in the bucket.
 
 Usage:
@@ -46,13 +46,16 @@ def load_reviews(csv_path: str, limit: int | None) -> pd.DataFrame:
     return df.reset_index(drop=True)
 
 
-def to_records(df: pd.DataFrame, batch_size: int) -> list[dict]:
-    records: list[dict] = []
+def batch_to_records(df: pd.DataFrame, batch_size: int) -> list[dict]:
+    """Embed one dataframe batch and convert it to LanceDB records.
+
+    Important: this intentionally only holds one batch of vectors in memory.
+    The previous implementation accumulated all 130k vectors and OOMed at the
+    end of the Cloud Run Job before it could write the LanceDB table.
+    """
     descriptions = df["description"].tolist()
-    vectors = []
-    for start in tqdm(range(0, len(descriptions), batch_size), desc="embedding"):
-        chunk = descriptions[start : start + batch_size]
-        vectors.extend(embed_documents(chunk, batch_size=batch_size))
+    vectors = embed_documents(descriptions, batch_size=batch_size)
+    records: list[dict] = []
 
     for row, vector in zip(df.to_dict(orient="records"), vectors, strict=True):
         records.append(
@@ -100,29 +103,31 @@ def main() -> None:
     df = load_reviews(args.csv, args.limit)
     print(f"  {len(df):,} reviews after cleaning")
 
-    print(f"Embedding with {settings.embedding_model} ...")
-    records = to_records(df, args.batch_size)
-
     db = connect()
-    mode = "overwrite" if args.overwrite else "create"
     existing = settings.lancedb_table in db.table_names()
+    table = db.open_table(settings.lancedb_table) if existing and not args.overwrite else None
+    mode = "overwrite" if args.overwrite else "create"
+    written = 0
 
-    if existing and not args.overwrite:
-        table = db.open_table(settings.lancedb_table)
-        table.add(records)
-        print(f"Appended {len(records):,} rows to '{settings.lancedb_table}'")
-    else:
-        table = db.create_table(
-            settings.lancedb_table,
-            data=records,
-            schema=build_schema(settings.embedding_dim),
-            mode=mode,
-        )
-        print(
-            f"Wrote {len(records):,} rows to "
-            f"'{settings.lancedb_table}' at {settings.lancedb_uri}"
-        )
+    print(f"Embedding with {settings.embedding_model} and writing to {settings.lancedb_uri} ...")
+    for start in tqdm(range(0, len(df), args.batch_size), desc="embedding+writes"):
+        batch_df = df.iloc[start : start + args.batch_size]
+        records = batch_to_records(batch_df, args.batch_size)
+        if not records:
+            continue
 
+        if table is None:
+            table = db.create_table(
+                settings.lancedb_table,
+                data=records,
+                schema=build_schema(settings.embedding_dim),
+                mode=mode,
+            )
+        else:
+            table.add(records)
+        written += len(records)
+
+    print(f"Wrote {written:,} rows to '{settings.lancedb_table}' at {settings.lancedb_uri}")
     print("Done.")
 
 

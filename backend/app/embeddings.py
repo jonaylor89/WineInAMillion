@@ -18,7 +18,9 @@ from .config import get_settings
 @lru_cache
 def get_model() -> SentenceTransformer:
     settings = get_settings()
-    return SentenceTransformer(settings.embedding_model)
+    token = settings.huggingface_token or settings.hf_token
+    kwargs = {"token": token} if token and not settings.embedding_model.startswith("/") else {}
+    return SentenceTransformer(settings.embedding_model, **kwargs)
 
 
 def embed_documents(texts: list[str], batch_size: int = 64) -> np.ndarray:

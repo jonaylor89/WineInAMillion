@@ -11,8 +11,8 @@ and shuttled CSV embeddings around S3 via SageMaker jobs. In 2026 we instead:
 
 - store embeddings + metadata in a single **LanceDB** table,
 - keep that table **in a cheap blob store** — no vector-DB server to operate,
-- embed with a modern small retrieval model (`bge-small-en-v1.5`),
-- optionally let an **LLM** explain *why* each wine fits.
+- embed with a modern small retrieval model (`bge-small-en-v1.5`) pre-downloaded into the backend image,
+- stream an **LLM** explanation of *why* each wine fits.
 
 LanceDB runs the approximate-nearest-neighbour search directly against the
 Lance columnar files in the bucket, so the only thing you pay for is object
@@ -28,20 +28,18 @@ uv run python -m app.ingest --csv data/winemag-data-130k-v2.csv --limit 5000 --o
 uv run uvicorn app.main:app --reload
 ```
 
-## Quickstart (MinIO / S3)
+## Quickstart (MinIO / Docker dev)
+
+From the repo root:
 
 ```bash
-# from the repo root: docker compose up -d minio createbuckets
 cp .env.example .env
-# in .env set:
-#   LANCEDB_URI=s3://wine/lancedb
-#   AWS_ENDPOINT=http://localhost:9000
-#   AWS_ACCESS_KEY_ID=minioadmin
-#   AWS_SECRET_ACCESS_KEY=minioadmin
-#   AWS_ALLOW_HTTP=true
-uv run python -m app.ingest --csv data/winemag-data-130k-v2.csv --overwrite
-uv run uvicorn app.main:app --reload
+make download
+make local
 ```
+
+`make local` starts MinIO, checks whether the LanceDB table exists, creates
+embeddings only when needed, and runs the backend with `uvicorn --reload`.
 
 To target real S3, drop `AWS_ENDPOINT`/`AWS_ALLOW_HTTP` and use IAM creds. For
 GCS, set `LANCEDB_URI=gs://...` and `GOOGLE_SERVICE_ACCOUNT`.
@@ -51,24 +49,21 @@ GCS, set `LANCEDB_URI=gs://...` and `GOOGLE_SERVICE_ACCOUNT`.
 ```bash
 curl -s localhost:8000/health | jq
 
-curl -s localhost:8000/search -H 'content-type: application/json' \
-  -d '{"query": "bold earthy red for steak night", "k": 5}' | jq
+curl -N localhost:8000/search/stream -H 'content-type: application/json' \
+  -d '{"query": "bold earthy red for steak night", "k": 5}'
 ```
 
-`POST /search` → `{ query, wines: [{title, variety, price, points, similarity, ...}], recommendation }`
+`POST /search/stream` returns NDJSON events: status updates, ranked wines, and
+streamed `recommendation_delta` chunks from OpenAI.
 
-The `recommendation` field is populated only when `LLM_ENABLED=true` and an
-`LLM_API_KEY` is set; otherwise you still get the ranked wines.
+`LLM_API_KEY` is required; recommendations are not an optional mode.
 
-## Enabling the LLM layer
-
-Set in `.env`:
+Set locally:
 
 ```
-LLM_ENABLED=true
 LLM_API_KEY=sk-...
 LLM_MODEL=gpt-4o-mini
-# any OpenAI-compatible endpoint also works:
+# OpenAI default is https://api.openai.com/v1, so this can stay blank.
 # LLM_BASE_URL=https://api.groq.com/openai/v1
 ```
 

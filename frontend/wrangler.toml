@@ -1,0 +1,16 @@
+name = "wine-in-a-million"
+main = "src/worker.ts"
+compatibility_date = "2026-07-01"
+
+# Cloudflare Workers Static Assets serves the Vite build output from the same
+# Worker that proxies /api/* to Cloud Run. The browser only talks to Cloudflare,
+# so the frontend loads instantly even when the Cloud Run backend is cold.
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[vars]
+# scripts/deploy.sh rewrites this to Terraform output `backend_service_url`
+# in a temporary Wrangler config before deploying.
+API_ORIGIN = "http://localhost:8000"

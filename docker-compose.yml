@@ -1,11 +1,10 @@
-# Local 2026 stack: MinIO (cheap S3-compatible blob store) + FastAPI backend
-# + Vite/React frontend. LanceDB stores its table inside the MinIO bucket, so
-# there is no separate vector database to run.
+# Local dev stack.
 #
-#   docker compose up -d minio createbuckets
-#   # ingest once (downloads the embedding model on first run):
-#   docker compose run --rm backend uv run python -m app.ingest --csv /data/winemag-data-130k-v2.csv --overwrite
-#   docker compose up backend frontend
+#   make download
+#   make local
+#
+# `make local` starts MinIO, creates the bucket, creates LanceDB embeddings only if
+# they are missing, then runs backend/frontend with hot reload.
 
 services:
   minio:
@@ -39,32 +38,71 @@ services:
       "
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        EMBEDDING_MODEL_SOURCE: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+      secrets:
+        - hf_token
+    command: uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
-      - minio
+      createbuckets:
+        condition: service_completed_successfully
     ports:
       - "8000:8000"
-    environment:
+    environment: &backend_env
       LANCEDB_URI: s3://wine/lancedb
       AWS_ENDPOINT: http://minio:9000
       AWS_ACCESS_KEY_ID: minioadmin
       AWS_SECRET_ACCESS_KEY: minioadmin
       AWS_ALLOW_HTTP: "true"
       AWS_REGION: us-east-1
-      CORS_ORIGINS: http://localhost:5173
-      # Set these to turn on the sommelier note:
-      # LLM_ENABLED: "true"
-      # LLM_API_KEY: ${LLM_API_KEY}
+      CORS_ORIGINS: http://localhost:5173,http://0.0.0.0:5173
+      LLM_API_KEY: ${OPENAI_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o-mini}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      HUGGINGFACE_TOKEN: ${HUGGINGFACE_TOKEN:-}
+      HF_TOKEN: ${HUGGINGFACE_TOKEN:-}
     volumes:
-      # mount your downloaded dataset here for the ingest job
+      - ./backend/app:/app/app
       - ./backend/data:/data
 
   frontend:
-    build: ./frontend
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     depends_on:
       - backend
     ports:
-      - "5173:80"
+      - "5173:5173"
+    environment:
+      VITE_API_TARGET: http://backend:8000
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
+
+  # Tool service used by `make local` for idempotent local ingestion.
+  ingest:
+    build:
+      context: ./backend
+      args:
+        EMBEDDING_MODEL_SOURCE: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
+      secrets:
+        - hf_token
+    profiles: ["tools"]
+    depends_on:
+      createbuckets:
+        condition: service_completed_successfully
+    environment: *backend_env
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/data:/data
+    entrypoint: ["uv", "run", "python", "-m", "app.ingest"]
 
 volumes:
   minio-data:
+  frontend-node-modules:
+
+secrets:
+  hf_token:
+    environment: HUGGINGFACE_TOKEN

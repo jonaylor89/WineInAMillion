@@ -2,7 +2,6 @@ locals {
   bucket_prefix      = var.bucket_prefix != "" ? var.bucket_prefix : "${var.project_id}-${var.name}"
   lancedb_bucket     = "${local.bucket_prefix}-lancedb"
   dataset_bucket     = "${local.bucket_prefix}-datasets"
-  frontend_bucket    = "${local.bucket_prefix}-frontend"
   backend_service_id = "${var.name}-api"
   ingest_job_id      = "${var.name}-ingest"
 
@@ -36,6 +35,36 @@ resource "google_artifact_registry_repository" "docker" {
   description   = "Docker images for ${var.name}"
   format        = "DOCKER"
   labels        = local.common_labels
+
+  cleanup_policy_dry_run = false
+
+  cleanup_policies {
+    id     = "delete-untagged-after-7-days"
+    action = "DELETE"
+    condition {
+      tag_state  = "UNTAGGED"
+      older_than = "604800s"
+    }
+  }
+
+  cleanup_policies {
+    id     = "delete-old-backend-tags-after-30-days"
+    action = "DELETE"
+    condition {
+      tag_state    = "TAGGED"
+      tag_prefixes = ["backend-"]
+      older_than   = "2592000s"
+    }
+  }
+
+  cleanup_policies {
+    id     = "keep-latest-10-backend-images"
+    action = "KEEP"
+    most_recent_versions {
+      package_name_prefixes = ["backend"]
+      keep_count            = 10
+    }
+  }
 
   depends_on = [google_project_service.apis]
 }
@@ -73,31 +102,6 @@ resource "google_storage_bucket" "datasets" {
   labels                      = local.common_labels
 
   depends_on = [google_project_service.apis]
-}
-
-resource "google_storage_bucket" "frontend" {
-  count = var.create_frontend_bucket ? 1 : 0
-
-  name                        = local.frontend_bucket
-  location                    = upper(var.region)
-  uniform_bucket_level_access = true
-  public_access_prevention    = "inherited"
-  labels                      = local.common_labels
-
-  website {
-    main_page_suffix = "index.html"
-    not_found_page   = "index.html"
-  }
-
-  depends_on = [google_project_service.apis]
-}
-
-resource "google_storage_bucket_iam_member" "frontend_public_read" {
-  count = var.create_frontend_bucket ? 1 : 0
-
-  bucket = google_storage_bucket.frontend[0].name
-  role   = "roles/storage.objectViewer"
-  member = "allUsers"
 }
 
 resource "google_service_account" "backend" {
@@ -138,10 +142,11 @@ resource "google_secret_manager_secret_iam_member" "backend_llm_secret_access" {
 resource "google_cloud_run_v2_service" "backend" {
   count = local.deploy_backend ? 1 : 0
 
-  name     = local.backend_service_id
-  location = var.region
-  ingress  = "INGRESS_TRAFFIC_ALL"
-  labels   = local.common_labels
+  name                = local.backend_service_id
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_ALL"
+  labels              = local.common_labels
+  deletion_protection = false
 
   template {
     service_account                  = google_service_account.backend.email
@@ -177,7 +182,7 @@ resource "google_cloud_run_v2_service" "backend" {
       }
       env {
         name  = "EMBEDDING_MODEL"
-        value = var.embedding_model
+        value = "/models/embedding"
       }
       env {
         name  = "EMBEDDING_DIM"
@@ -186,10 +191,6 @@ resource "google_cloud_run_v2_service" "backend" {
       env {
         name  = "CORS_ORIGINS"
         value = var.cors_origins
-      }
-      env {
-        name  = "LLM_ENABLED"
-        value = tostring(var.llm_enabled)
       }
       env {
         name  = "LLM_MODEL"
@@ -246,14 +247,16 @@ resource "google_cloud_run_v2_service_iam_member" "public_backend" {
 resource "google_cloud_run_v2_job" "ingest" {
   count = local.deploy_backend && var.ingest_csv_uri != "" ? 1 : 0
 
-  name     = local.ingest_job_id
-  location = var.region
-  labels   = local.common_labels
+  name                = local.ingest_job_id
+  location            = var.region
+  labels              = local.common_labels
+  deletion_protection = false
 
   template {
     template {
       service_account = google_service_account.backend.email
-      timeout         = "3600s"
+      timeout         = var.ingest_timeout
+      max_retries     = 0
 
       containers {
         image   = var.backend_image
@@ -285,7 +288,7 @@ resource "google_cloud_run_v2_job" "ingest" {
         }
         env {
           name  = "EMBEDDING_MODEL"
-          value = var.embedding_model
+          value = "/models/embedding"
         }
         env {
           name  = "EMBEDDING_DIM"

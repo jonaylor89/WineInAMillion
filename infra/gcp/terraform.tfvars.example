@@ -1,4 +1,4 @@
-project_id = "your-gcp-project-id"
+project_id = "wine-in-a-million-501121"
 region     = "us-central1"
 name       = "wine-in-a-million"
 
@@ -8,15 +8,15 @@ deploy_backend = false
 backend_image  = ""
 
 # Upload the wine CSV to the dataset bucket, then set this for the ingest job:
-# ingest_csv_uri = "gs://your-gcp-project-id-wine-in-a-million-datasets/winemag-data-130k-v2.csv"
+# ingest_csv_uri = "gs://wine-in-a-million-501121-wine-in-a-million-datasets/winemag-data-130k-v2.csv"
 
-# Replace with your real frontend origin once deployed.
+# With the Cloudflare Worker proxy, browsers normally do same-origin /api calls.
+# Keep this strict only if you also expose the Cloud Run API directly to browsers.
 cors_origins = "*"
 
 # Set to 1 if you want to avoid model-download cold starts.
 backend_min_instances = 0
 
-# Optional LLM explanations:
-llm_enabled        = false
+# Required streaming LLM recommendations:
 llm_model          = "gpt-4o-mini"
-llm_api_key_secret = ""
+llm_api_key_secret = "wine-llm-api-key"

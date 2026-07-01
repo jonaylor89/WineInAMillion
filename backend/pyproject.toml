@@ -12,6 +12,7 @@ dependencies = [
     "lancedb>=0.15",
     "pyarrow>=17",
     "sentence-transformers>=3.3",
+    "torch>=2.6,<3",
     "pandas>=2.2",
     "numpy>=1.26",
     "httpx>=0.27",
@@ -28,6 +29,19 @@ dev = [
 
 [tool.uv]
 package = false
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cpu", marker = "platform_system == 'Linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 100

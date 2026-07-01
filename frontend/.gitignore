@@ -4,3 +4,6 @@ dist/
 *.local
 .vite/
 *.tsbuildinfo
+
+.wrangler/
+.wrangler.deploy.toml
