@@ -1,0 +1,22 @@
+project_id = "your-gcp-project-id"
+region     = "us-central1"
+name       = "wine-in-a-million"
+
+# First apply with deploy_backend=false to create GCS + Artifact Registry.
+# After building/pushing the backend image, set deploy_backend=true and set backend_image.
+deploy_backend = false
+backend_image  = ""
+
+# Upload the wine CSV to the dataset bucket, then set this for the ingest job:
+# ingest_csv_uri = "gs://your-gcp-project-id-wine-in-a-million-datasets/winemag-data-130k-v2.csv"
+
+# Replace with your real frontend origin once deployed.
+cors_origins = "*"
+
+# Set to 1 if you want to avoid model-download cold starts.
+backend_min_instances = 0
+
+# Optional LLM explanations:
+llm_enabled        = false
+llm_model          = "gpt-4o-mini"
+llm_api_key_secret = ""
