@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap');
+
+:root {
+  --bg: #f7f5ef;
+  --surface: #ffffff;
+  --surface-soft: #fbfaf6;
+  --surface-tint: #efebe1;
+  --ink: #202624;
+  --muted: #68736f;
+  --faint: #8b9692;
+  --line: rgba(32, 38, 36, 0.1);
+  --line-strong: rgba(32, 38, 36, 0.16);
+  --teal: #2f8f9d;
+  --teal-soft: #99cad0;
+  --gold: #ffb500;
+  --gold-deep: #c98700;
+  --error: #b3261e;
+
+  --font-body: 'Open Sans', Helvetica, sans-serif;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --shadow-float: 0 24px 70px rgba(22, 35, 38, 0.1);
+  --shadow-card: 0 10px 30px rgba(22, 35, 38, 0.08);
+
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body,
+#root { min-height: 100%; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(153, 202, 208, 0.55), transparent 30rem),
+    linear-gradient(180deg, #fcfbf8 0%, var(--bg) 48%, #f3f0e8 100%);
+}
+
+button,
+textarea { font-family: inherit; }
+
+button:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(47, 143, 157, 0.35);
+  outline-offset: 3px;
+}
+
+a { color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

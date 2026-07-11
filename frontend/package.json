@@ -1,0 +1,28 @@
+{
+  "name": "wine-in-a-million-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:worker": "npm run build && npx --yes wrangler@4.22.0 dev",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "deploy:worker": "npm run build && npx --yes wrangler@4.22.0 deploy",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@cloudflare/workers-types": "^4.20250617.0",
+    "eslint": "^9.17.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}

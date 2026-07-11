@@ -1,0 +1,15 @@
+# local secrets/config
+.env
+*.local
+
+# local datasets / generated outputs
+backend/data/
+frontend/dist/
+
+# caches / virtualenvs
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+node_modules/

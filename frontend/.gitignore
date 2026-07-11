@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+*.local
+.vite/
+*.tsbuildinfo
+
+.wrangler/
+.wrangler.deploy.toml
